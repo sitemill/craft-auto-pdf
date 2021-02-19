@@ -11,10 +11,10 @@
 namespace sitemill\autopdf\services;
 
 use craft\elements\Asset;
-use craft\helpers\App;
 use craft\helpers\Assets;
-use Imagick;
 use sitemill\autopdf\AutoPdf;
+use Spatie\PdfToImage\Pdf;
+use Org_Heigl\Ghostscript\Ghostscript;
 
 use Craft;
 use craft\base\Component;
@@ -83,9 +83,8 @@ class AutoPdfService extends Component
         $counterpart = Asset::find()->filename($counterpartFilename)->one();
         if (!$counterpart) {
             $tempPath = $this->getTempPath($filename);
-            if ($this->rasterizePdf($sourcePath, $tempPath)) {
-                $counterpart = $this->setCounterpart($tempPath, $counterpartFilename);
-            }
+            $this->rasterizePdf($sourcePath, $tempPath);
+            $counterpart = $this->setCounterpart($tempPath, $counterpartFilename);
         }
 
         return $counterpart;
@@ -152,18 +151,20 @@ class AutoPdfService extends Component
      */
     private function rasterizePdf($sourcePath, $destPath)
     {
-        App::maxPowerCaptain();
-        $im = new Imagick();
-        $im->setBackgroundColor('white');
-        $im->setResolution(144, 144);
-        $im->SetColorspace(Imagick::COLORSPACE_SRGB);
-        $im->readimage($sourcePath);
-        $im->setImageFormat('jpeg');
-        $im->writeImage($destPath);
-        $im->clear();
-        $im->destroy();
-        return true;
+//        App::maxPowerCaptain();
+//        $im = new Imagick();
+//        $im->readimage($sourcePath);
+//        $im->setImageFormat('jpeg');
+//        $im->setBackgroundColor('white');
+//        $im->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE);
+//        $im->setResolution(144, 144);
+//        $im->SetColorspace(Imagick::COLORSPACE_SRGB);
+//        $im->writeImage($destPath);
+//        $im->clear();
+//        $im->destroy();
+//        return true;
+        Ghostscript::setGsPath("/usr/local/bin/gs");
+        $pdf = new Pdf($sourcePath);
+        return $pdf->saveImage($destPath);
     }
-
-
 }
