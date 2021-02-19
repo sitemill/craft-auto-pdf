@@ -10,6 +10,8 @@
 
 namespace sitemill\autopdf;
 
+use craft\elements\Asset;
+use craft\events\AssetThumbEvent;
 use craft\events\GetAssetUrlEvent;
 use craft\helpers\UrlHelper;
 use sitemill\autopdf\models\Settings;
@@ -20,6 +22,7 @@ use craft\base\Plugin;
 use craft\services\Plugins;
 use craft\services\Assets;
 use craft\events\PluginEvent;
+use craft\helpers\Assets as AssetsHelper;
 
 
 use yii\base\Event;
@@ -133,23 +136,23 @@ class AutoPdf extends Plugin
      */
     protected function installEventHandlers()
     {
-        $settings = $this->getSettings();
         Event::on(Assets::class,
             Assets::EVENT_GET_ASSET_URL,
             function(GetAssetUrlEvent $event) {
                 if ($event->asset !== null && $event->transform !== null && $event->asset->kind === 'pdf' && $event->transform) {
-
-
-                    $event->url = AutoPdf::$plugin->autoPdfService->getPdfTransform($event->asset);
-
-
-//                    var_dump($event->asset);
-
-
-
+                    $event->url = AutoPdf::$plugin->autoPdfService->getPdfTransform($event->asset, $event->transform);
                 }
             }
+        );
 
+        Event::on(Assets::class,
+            Assets::EVENT_GET_THUMB_PATH,
+            function(AssetThumbEvent $event) {
+                $asset = $event->asset;
+                if (AssetsHelper::getFileKindByExtension($asset->filename) === Asset::KIND_PDF) {
+                    $event->path = AutoPdf::$plugin->autoPdfService->getPdfThumb($event);
+                }
+            }
         );
     }
 

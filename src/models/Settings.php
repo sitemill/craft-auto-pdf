@@ -25,6 +25,6 @@ use craft\validators\ArrayValidator;
  */
 class Settings extends Model
 {
-    public $pdfVolumeId = '2';
+    public $pdfFolderId = '6';
     public $conversionOptions = '-density 72 -colorspace sRGB -background white';
 }
