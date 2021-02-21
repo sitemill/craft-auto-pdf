@@ -1,0 +1,28 @@
+{% import "_includes/forms" as forms %}
+
+{% set assetVolumes = craft.app.volumes.allVolumes %}
+
+{% if assetVolumes|length  %}
+    {% set sources = {} %}
+
+    {% for volume in assetVolumes %}
+        {% set sources = sources|merge({
+            (volume.handle) : {
+                label: volume.name,
+                value: volume.id
+            }
+        }) %}
+
+    {% endfor %}
+
+    {{ forms.selectField({
+        label: 'Assets source'|t('silo'),
+        instructions: 'Select the volume where assets will be uploaded.'|t('silo'),
+        id: 'pdfVolume',
+        name: 'pdfVolume',
+        value: settings.pdfVolume,
+        options: sources
+    }) }}
+{% else %}
+    <span style="color:red"> {{ "No volumes exist yet."|t('app') }}</span>
+{% endif %}

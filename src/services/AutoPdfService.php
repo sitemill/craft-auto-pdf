@@ -11,14 +11,15 @@
 namespace sitemill\autopdf\services;
 
 use craft\elements\Asset;
+use craft\helpers\App;
 use craft\helpers\Assets;
 use sitemill\autopdf\AutoPdf;
 use Spatie\PdfToImage\Pdf;
-use Org_Heigl\Ghostscript\Ghostscript;
 
 use Craft;
 use craft\base\Component;
 use Yii;
+use yii\base\Exception;
 
 /**
  * @author    Sitemill
@@ -28,43 +29,14 @@ use Yii;
 class AutoPdfService extends Component
 {
 
-    public $sourceAsset = null;
-    public $sourcePath = '';
-    public $filename = '';
-    public $tempPath = '';
-    public $destinationFolderId = '';
-
+    public $settings = [];
     // Public Methods
     // =========================================================================
 
-    /*
-     * @return mixed
-     */
-    public function getPdfTransform(Asset $asset, $transform)
+    public function __construct()
     {
-        // Get the counterpart asset
-        $counterpart = $this->getCounterpart($asset);
-
-        // Return the transform
-        return $counterpart->getUrl($transform);
-    }
-
-    /*
-     * @return mixed
-     */
-    public function getPdfThumb($event)
-    {
-        // Get the counterpart asset
-        $counterpart = $this->getCounterpart($event->asset);
-
-        if ($counterpart->getWidth() && $counterpart->getHeight()) {
-            [$width, $height] = Assets::scaledDimensions($counterpart->getWidth(), $counterpart->getHeight(), $event->width, $event->width);
-        } else {
-            $width = $height = $event->width;
-        }
-
-        // Return the transform
-        return Craft::$app->getAssets()->getThumbPath($counterpart, $width, $height);
+        $this->settings = AutoPdf::$plugin->getSettings();
+        parent::__construct();
     }
 
     /*
@@ -95,11 +67,18 @@ class AutoPdfService extends Component
     */
     private function setCounterpart($filePath, $filename)
     {
-        $counterpart = new Asset();
-        $counterpart->tempFilePath = $filePath;
-        $counterpart->filename = $filename;
-        $counterpart->folderId = AutoPdf::$plugin->getSettings()->pdfFolderId;
-        return Craft::$app->getElements()->saveElement($counterpart);
+        $volumeId = $this->settings->pdfVolume;
+        if ($volumeId) {
+            $volume = Craft::$app->volumes->getVolumeById($this->settings->pdfVolume);
+            $volumeRootFolder = Craft::$app->assets->getRootFolderByVolumeId($volume->id);
+            $counterpart = new Asset();
+            $counterpart->tempFilePath = $filePath;
+            $counterpart->filename = $filename;
+            $counterpart->folderId = $volumeRootFolder->id;
+            return Craft::$app->getElements()->saveElement($counterpart);
+        } else {
+            throw new Exception(Craft::t('auto-pdf', 'No volume set for Auto PDF.'));
+        }
     }
 
     /*
@@ -121,50 +100,19 @@ class AutoPdfService extends Component
         return $tempFolder . '/' . $filename . '.jpg';
     }
 
-    /**
-     * Returns the attached asset.
-     */
-    public function getSourceAsset()
-    {
-        if ($this->sourceAsset !== null) {
-            return $this->sourceAsset;
-        }
-
-        if ($this->assetId === null) {
-            return null;
-        }
-
-        return $this->_file;
-    }
-
-    /**
-     * Sets the attached asset.
-     */
-    public function setSourceAsset(Asset $asset = null)
-    {
-        $this->sourceAsset = $asset;
-    }
-
 
     /*
      * @return mixed
      */
-    private function rasterizePdf($sourcePath, $destPath)
+    public function rasterizePdf($sourcePath, $destPath)
     {
-//        App::maxPowerCaptain();
-//        $im = new Imagick();
-//        $im->readimage($sourcePath);
-//        $im->setImageFormat('jpeg');
-//        $im->setBackgroundColor('white');
-//        $im->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE);
-//        $im->setResolution(144, 144);
-//        $im->SetColorspace(Imagick::COLORSPACE_SRGB);
-//        $im->writeImage($destPath);
-//        $im->clear();
-//        $im->destroy();
-//        return true;
-        Ghostscript::setGsPath("/usr/local/bin/gs");
+        App::maxPowerCaptain();
         $pdf = new Pdf($sourcePath);
+        $pdf->setCompressionQuality($this->settings->compressionQuality);
+        $pdf->setResolution($this->settings->dpi);
+        $pdf->setColorspace(1);
         return $pdf->saveImage($destPath);
     }
+
+//  TODO: force re-rasterize on asset replace
 }

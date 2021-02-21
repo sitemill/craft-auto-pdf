@@ -14,8 +14,9 @@ use craft\elements\Asset;
 use craft\events\AssetThumbEvent;
 use craft\events\GetAssetUrlEvent;
 use craft\helpers\UrlHelper;
+use craft\services\Elements;
 use sitemill\autopdf\models\Settings;
-use sitemill\autopdf\services\AutoPdfService as AutoPdfServiceService;
+use sitemill\autopdf\services\AutoPdfService;
 
 use Craft;
 use craft\base\Plugin;
@@ -34,7 +35,7 @@ use yii\base\Event;
  * @package   AutoPdf
  * @since     1.0.0
  *
- * @property  AutoPdfServiceService $autoPdfService
+ * @property  AutoPdfService $autoPdfService
  */
 class AutoPdf extends Plugin
 {
@@ -74,7 +75,6 @@ class AutoPdf extends Plugin
     {
         parent::init();
         self::$plugin = $this;
-
 
         // Do something on install
         Event::on(
@@ -140,7 +140,8 @@ class AutoPdf extends Plugin
             Assets::EVENT_GET_ASSET_URL,
             function(GetAssetUrlEvent $event) {
                 if ($event->asset !== null && $event->transform !== null && $event->asset->kind === 'pdf' && $event->transform) {
-                    $event->url = AutoPdf::$plugin->autoPdfService->getPdfTransform($event->asset, $event->transform);
+                    $counterpart = AutoPdf::$plugin->autoPdfService->getCounterpart($event->asset);
+                    $event->url = $counterpart->getUrl($event->transform);
                 }
             }
         );
@@ -149,11 +150,33 @@ class AutoPdf extends Plugin
             Assets::EVENT_GET_THUMB_PATH,
             function(AssetThumbEvent $event) {
                 $asset = $event->asset;
-                if (AssetsHelper::getFileKindByExtension($asset->filename) === Asset::KIND_PDF) {
-                    $event->path = AutoPdf::$plugin->autoPdfService->getPdfThumb($event);
+                if ($event->asset->kind === 'pdf') {
+                    $counterpart = AutoPdf::$plugin->autoPdfService->getCounterpart($asset);
+                    if ($counterpart->getWidth() && $counterpart->getHeight()) {
+                        [$width, $height] = \craft\helpers\Assets::scaledDimensions($counterpart->getWidth(), $counterpart->getHeight(), $event->width, $event->width);
+                    } else {
+                        $width = $height = $event->width;
+                    }
+                    $event->path = Craft::$app->getAssets()->getThumbPath($counterpart, $width, $height);
                 }
             }
         );
+
+        if ($this->getSettings()->generatePdfOnAssetSave) {
+            Event::on(
+                Elements::class,
+                Elements::EVENT_AFTER_SAVE_ELEMENT,
+                function(Event $event) {
+                    $element = $event->element;
+                    if ($element instanceof \craft\elements\Asset) {
+                        if ($element->extension === 'pdf') {
+                            AutoPdf::$plugin->autoPdfService->getCounterpart($element);
+                        }
+                    }
+                }
+            );
+        }
+//        TODO: On delete asset, delete counterpart
     }
 
 }
