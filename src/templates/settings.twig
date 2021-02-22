@@ -1,7 +1,5 @@
 {% import "_includes/forms" as forms %}
 
-<p></p>
-
 {% set assetVolumes = craft.app.volumes.allVolumes() %}
 
 {% if assetVolumes|length  %}
@@ -26,8 +24,8 @@
         options: sources
     }) }}
 
-
     <hr>
+
     {{ forms.selectField({
         label: "Quality"|t('app'),
         id: "compressionQuality",
@@ -53,6 +51,6 @@
     }) }}
 
 {% else %}
-    <span style="color:red"> {{ "No volumes exist yet."|t('app') }}</span>
+    <p>{{ "No volumes exist yet."|t('app') }}</p>
 {% endif %}
 
