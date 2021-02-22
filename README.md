@@ -1,12 +1,11 @@
-# Auto PDF plugin for Craft CMS 3.x
+# Auto PDF plugin for Craft CMS
 
 Seamlessly create PDF thumbnails using Craft's built in image transformer.
 
-![Screenshot](resources/img/plugin-logo.png)
 
 ## Requirements
 
-This plugin requires Craft CMS 3.0.0-beta.23 or later.
+This plugin requires Craft CMS 3.6 or later, as well as Imagick and Ghostscript.
 
 ## Installation
 
@@ -22,22 +21,20 @@ To install the plugin, follow these instructions.
 
 3. In the Control Panel, go to Settings → Plugins and click the “Install” button for Auto PDF.
 
-## Auto PDF Overview
+## AutoPDF Overview
 
--Insert text here-
+AutoPDF will allow you to perform standard Craft transforms on any PDF file, as well as generating PDF thumbnails in the control panel.
+
+Flattening a PDF can be pretty stessful for your server, so to help it out AutoPDF creates and stores a hi-res flattened version of your uploaded PDF and creates subsequent transforms from this.  
 
 ## Configuring Auto PDF
 
--Insert text here-
-
-## Using Auto PDF
-
--Insert text here-
+Auto PDF requires you to setup a seperate volume to store the hi-res image files. It's recommended that you hide this volume from your users to avoid confusion.
 
 ## Auto PDF Roadmap
 
 Some things to do, and ideas for potential features:
 
-* Release it
+* Option to output PNG's
 
 Brought to you by [Sitemill](sitemill.co)

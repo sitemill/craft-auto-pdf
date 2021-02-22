@@ -27,6 +27,6 @@ class Settings extends Model
 {
     public $pdfVolume = null;
     public $generatePdfOnAssetSave = true;
-    public $compressionQuality = 60;
+    public $compressionQuality = 82;
     public $dpi = 300;
 }

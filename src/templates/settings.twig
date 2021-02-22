@@ -1,6 +1,8 @@
 {% import "_includes/forms" as forms %}
 
-{% set assetVolumes = craft.app.volumes.allVolumes %}
+<p></p>
+
+{% set assetVolumes = craft.app.volumes.allVolumes() %}
 
 {% if assetVolumes|length  %}
     {% set sources = {} %}
@@ -17,12 +19,40 @@
 
     {{ forms.selectField({
         label: 'Assets source'|t('silo'),
-        instructions: 'Select the volume where assets will be uploaded.'|t('silo'),
+        instructions: 'Select a volume where the Jpg will be uploaded.'|t('auto-pdf'),
         id: 'pdfVolume',
         name: 'pdfVolume',
         value: settings.pdfVolume,
         options: sources
     }) }}
+
+
+    <hr>
+    {{ forms.selectField({
+        label: "Quality"|t('app'),
+        id: "compressionQuality",
+        name: "compressionQuality",
+        options: [
+            {label: 'Low'|t('app'), value: '10'},
+            {label: 'Medium'|t('app'), value: '30'},
+            {label: 'High'|t('app'), value: '60'},
+            {label: 'Very High (Recommended)'|t('app'), value: '82'},
+            {label: 'Maximum'|t('app'), value: '100'},
+        ],
+        value: (settings.compressionQuality is defined ? settings.compressionQuality : 82),
+    }) }}
+
+    {{ forms.textField({
+        label: "Resolution"|t('auto-pdf'),
+        id: "dpi",
+        name: "dpi",
+        unit: "dpi",
+        maxlength: '3',
+        size: '4',
+        value: (settings.dpi is defined ? settings.dpi : ""),
+    }) }}
+
 {% else %}
     <span style="color:red"> {{ "No volumes exist yet."|t('app') }}</span>
 {% endif %}
+
