@@ -39,5 +39,6 @@ Some things to do, and ideas for potential features:
 
 * Delete counterpart on PDF deletion
 * Option to output PNG's
+* Look at pushing conversion to the job queue
 
 Brought to you by [Sitemill](sitemill.co)

@@ -93,8 +93,10 @@ class AutoPdf extends Plugin
             }
         );
 
-        // Install our global event handlers
-        $this->installEventHandlers();
+        // Install our global event handlers if volume is defined
+        if ($this->getSettings()->pdfVolume) {
+            $this->installEventHandlers();
+        }
 
         Craft::info(
             Craft::t(
