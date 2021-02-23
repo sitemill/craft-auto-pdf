@@ -26,7 +26,7 @@ use craft\validators\ArrayValidator;
 class Settings extends Model
 {
     public $pdfVolume = null;
-    public $generatePdfOnAssetSave = true;
+    public $generateExisting = false;
     public $compressionQuality = 82;
     public $dpi = 300;
 }

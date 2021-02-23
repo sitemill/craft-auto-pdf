@@ -145,9 +145,11 @@ class AutoPdf extends Plugin
                 $transform = $event->transform;
                 if ($asset !== null && $transform !== null && $asset->kind === 'pdf' && $transform) {
                     // Get our counterpart
-                    $counterpart = AutoPdf::$plugin->autoPdfService->getCounterpart($asset);
+                    $counterpart = AutoPdf::$plugin->autoPdfService->getCounterpart($asset, $this->getSettings()->generateExisting);
                     // Transform counterpart using standard asset transform
-                    $event->url = $counterpart->getUrl($transform);
+                    if ($counterpart) {
+                        $event->url = $counterpart->getUrl($transform);
+                    }
                 }
             }
         );
@@ -158,32 +160,27 @@ class AutoPdf extends Plugin
                 $asset = $event->asset;
                 if ($asset->kind === 'pdf') {
                     // Get our counterpart
-                    $counterpart = AutoPdf::$plugin->autoPdfService->getCounterpart($asset);
-                    // Get the width/height for CP thumb
-                    if ($counterpart->getWidth() && $counterpart->getHeight()) {
-                        [$width, $height] = \craft\helpers\Assets::scaledDimensions($counterpart->getWidth(), $counterpart->getHeight(), $event->width, $event->width);
-                    } else {
-                        $width = $height = $event->width;
+                    $counterpart = AutoPdf::$plugin->autoPdfService->getCounterpart($asset, $this->getSettings()->generateExisting);
+                    if ($counterpart) {
+                        // Transform counterpart using standard Craft transform
+                        $event->url = Craft::$app->getAssets()->getThumbUrl($counterpart, $event->width, $event->height);
                     }
-                    // Transform counterpart using standard Craft transform
-                    $event->url = Craft::$app->getAssets()->getThumbUrl($counterpart, $width, $height);
                 }
             }
         );
 
-        if ($this->getSettings()->generatePdfOnAssetSave) {
-            Event::on(
-                Elements::class,
-                Elements::EVENT_AFTER_SAVE_ELEMENT,
-                function(Event $event) {
-                    $element = $event->element;
-                    if (($element instanceof \craft\elements\Asset) && $element->kind === 'pdf') {
-                        // Trigger creation of counterpart
-                        AutoPdf::$plugin->autoPdfService->getCounterpart($element);
-                    }
+
+        Event::on(
+            Elements::class,
+            Elements::EVENT_AFTER_SAVE_ELEMENT,
+            function(Event $event) {
+                $element = $event->element;
+                if (($element instanceof \craft\elements\Asset) && $element->kind === 'pdf') {
+                    // Trigger creation of counterpart
+                    AutoPdf::$plugin->autoPdfService->getCounterpart($element);
                 }
-            );
-        }
+            }
+        );
 //        TODO: On delete asset, delete counterpart
     }
 

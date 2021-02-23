@@ -42,19 +42,18 @@ class AutoPdfService extends Component
     /*
     * @return mixed
     */
-    public function getCounterpart(Asset $asset)
+    public function getCounterpart(Asset $asset, bool $generate = true)
     {
-        // Get filename of source asset
-        $filename = $asset->filename;
-
         // Build unique filename for counterpart
-        $counterpartFilename = $filename . '-' . $asset->id . '.jpg';
+        $counterpartFilename = pathinfo($asset->filename, PATHINFO_FILENAME) . '-' . $asset->id . '.jpg';
 
         // Check for existing counterpart
         $counterpart = Asset::find()->filename($counterpartFilename)->one();
-        if (!$counterpart) {
-            $tempFile = $this->rasterizePdf($asset->getCopyOfFile(), $filename);
-            $counterpart = $this->setCounterpart($tempFile, $counterpartFilename);
+        if (!$counterpart && $generate) {
+            $tempFile = $this->rasterizePdf($asset->getCopyOfFile(), $counterpartFilename);
+            if ($this->setCounterpart($tempFile, $counterpartFilename)) {
+                $counterpart = Asset::find()->filename($counterpartFilename)->one();
+            }
         }
         return $counterpart;
     }
@@ -66,12 +65,10 @@ class AutoPdfService extends Component
     {
         $volumeId = $this->settings->pdfVolume;
         if ($volumeId) {
-            $volume = Craft::$app->volumes->getVolumeById($this->settings->pdfVolume);
-            $volumeRootFolder = Craft::$app->assets->getRootFolderByVolumeId($volume->id);
             $counterpart = new Asset();
             $counterpart->tempFilePath = $filePath;
             $counterpart->filename = $filename;
-            $counterpart->folderId = $volumeRootFolder->id;
+            $counterpart->folderId = Craft::$app->assets->getRootFolderByVolumeId($volumeId)->id;
             return Craft::$app->getElements()->saveElement($counterpart);
         } else {
             throw new Exception(Craft::t('auto-pdf', 'No volume set for Auto PDF.'));
@@ -94,7 +91,7 @@ class AutoPdfService extends Component
     public function getTempPath($filename)
     {
         $tempFolder = Craft::$app->path->getTempPath();
-        return $tempFolder . '/' . $filename . '.jpg';
+        return $tempFolder . '/' . $filename;
     }
 
 
@@ -111,7 +108,6 @@ class AutoPdfService extends Component
         $pdf->setColorspace(1);
         $pdf->saveImage($destinationPath);
         return $destinationPath;
-
     }
 
 //  TODO: force re-rasterize on asset replace

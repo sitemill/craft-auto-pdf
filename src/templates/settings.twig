@@ -29,6 +29,13 @@
         options: sources
     }) }}
 
+    {{ forms.lightswitchField({
+        label: "Convert existing PDFs"|t('auto-pdf'),
+        instructions: "If enabled, all existing PDFs will be converted. If you have a lot of PDFs, this can take a long time and bring your site to a hault."|t('auto-pdf'),
+        id: 'generateExisting',
+        name: 'generateExisting',
+        on: (settings.generateExisting is defined) ? settings.generateExisting : ""}) }}
+
     <hr>
 
     {{ forms.selectField({
