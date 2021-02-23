@@ -23,11 +23,11 @@ To install the plugin, follow these instructions.
 
 3. In the Control Panel, go to Settings → Plugins and click the “Install” button for Auto PDF.
 
-## AutoPDF Overview
+## Auto PDF Overview
 
-AutoPDF will allow you to perform standard Craft transforms on any PDF file, as well as generating PDF thumbnails in the control panel.
+Auto PDF will allow you to perform standard Craft transforms on any PDF file, as well as generating PDF thumbnails in the control panel.
 
-Flattening a PDF can be pretty stressful for your server, so to help it out AutoPDF creates and stores a hi-res flattened version of your uploaded PDF and creates subsequent transforms from this.  
+Flattening a PDF can be pretty stressful for your server, so to help it out Auto PDF creates and stores a hi-res flattened version of your uploaded PDF and creates subsequent transforms from this.  
 
 ## Configuring Auto PDF
 
@@ -38,7 +38,7 @@ Auto PDF requires you to set up a separate volume to store the hi-res image file
 Some things to do, and ideas for potential features:
 
 * Delete counterpart on PDF deletion
-* Option to output PNG's
+* Option to output PNGs
 * Look at pushing conversion to the job queue
 
 Brought to you by [Sitemill](sitemill.co)
