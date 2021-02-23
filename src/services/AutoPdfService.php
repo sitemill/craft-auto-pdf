@@ -44,9 +44,8 @@ class AutoPdfService extends Component
     */
     public function getCounterpart(Asset $asset)
     {
-        // Get full path and filename of source asset
-        $sourcePath = $this->getSourcePdfPath($asset);
-        $filename = pathinfo($sourcePath, PATHINFO_FILENAME);
+        // Get filename of source asset
+        $filename = $asset->filename;
 
         // Build unique filename for counterpart
         $counterpartFilename = $filename . '-' . $asset->id . '.jpg';
@@ -55,10 +54,9 @@ class AutoPdfService extends Component
         $counterpart = Asset::find()->filename($counterpartFilename)->one();
         if (!$counterpart) {
             $tempPath = $this->getTempPath($filename);
-            $this->rasterizePdf($sourcePath, $tempPath);
+            $this->rasterizePdf($asset->getCopyOfFile(),$tempPath);
             $counterpart = $this->setCounterpart($tempPath, $counterpartFilename);
         }
-
         return $counterpart;
     }
 
@@ -104,7 +102,7 @@ class AutoPdfService extends Component
     /*
      * @return mixed
      */
-    public function rasterizePdf($sourcePath, $destPath)
+    public function rasterizePdf($sourcePath,$destPath)
     {
         App::maxPowerCaptain();
         $pdf = new Pdf($sourcePath);
