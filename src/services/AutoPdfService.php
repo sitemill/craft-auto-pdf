@@ -53,9 +53,8 @@ class AutoPdfService extends Component
         // Check for existing counterpart
         $counterpart = Asset::find()->filename($counterpartFilename)->one();
         if (!$counterpart) {
-            $tempPath = $this->getTempPath($filename);
-            $this->rasterizePdf($asset->getCopyOfFile(),$tempPath);
-            $counterpart = $this->setCounterpart($tempPath, $counterpartFilename);
+            $tempFile = $this->rasterizePdf($asset->getCopyOfFile(), $filename);
+            $counterpart = $this->setCounterpart($tempFile, $counterpartFilename);
         }
         return $counterpart;
     }
@@ -102,14 +101,17 @@ class AutoPdfService extends Component
     /*
      * @return mixed
      */
-    public function rasterizePdf($sourcePath,$destPath)
+    public function rasterizePdf($sourcePath,$filename)
     {
+        $destinationPath = $this->getTempPath($filename);
         App::maxPowerCaptain();
         $pdf = new Pdf($sourcePath);
         $pdf->setCompressionQuality($this->settings->compressionQuality);
         $pdf->setResolution($this->settings->dpi);
         $pdf->setColorspace(1);
-        return $pdf->saveImage($destPath);
+        $pdf->saveImage($destinationPath);
+        return $destinationPath;
+
     }
 
 //  TODO: force re-rasterize on asset replace
