@@ -162,8 +162,13 @@ class AutoPdf extends Plugin
                     // Get our counterpart
                     $counterpart = AutoPdf::$plugin->autoPdfService->getCounterpart($asset, $this->getSettings()->generateExisting);
                     if ($counterpart) {
+                        if ($counterpart->getWidth() && $counterpart->getHeight()) {
+                            [$width, $height] = \craft\helpers\Assets::scaledDimensions($counterpart->getWidth(), $counterpart->getHeight(), $event->width, $event->width);
+                        } else {
+                            $width = $height = $event->width;
+                        }
                         // Transform counterpart using standard Craft transform
-                        $event->url = Craft::$app->getAssets()->getThumbUrl($counterpart, $event->width, $event->height);
+                        $event->url = Craft::$app->getAssets()->getThumbUrl($counterpart, $width, $height);
                     }
                 }
             }
