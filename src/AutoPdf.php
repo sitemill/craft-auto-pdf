@@ -11,7 +11,7 @@
 namespace sitemill\autopdf;
 
 use craft\elements\Asset;
-use craft\events\AssetThumbEvent;
+use craft\events\GetAssetThumbUrlEvent;
 use craft\events\GetAssetUrlEvent;
 use craft\helpers\UrlHelper;
 use craft\services\Elements;
@@ -153,10 +153,10 @@ class AutoPdf extends Plugin
         );
 
         Event::on(Assets::class,
-            Assets::EVENT_GET_THUMB_PATH,
-            function(AssetThumbEvent $event) {
+            Assets::EVENT_GET_ASSET_THUMB_URL,
+            function(GetAssetThumbUrlEvent $event) {
                 $asset = $event->asset;
-                if ($event->asset->kind === 'pdf') {
+                if ($asset->kind === 'pdf') {
                     // Get our counterpart
                     $counterpart = AutoPdf::$plugin->autoPdfService->getCounterpart($asset);
                     // Get the width/height for CP thumb
@@ -166,7 +166,7 @@ class AutoPdf extends Plugin
                         $width = $height = $event->width;
                     }
                     // Transform counterpart using standard Craft transform
-                    $event->path = Craft::$app->getAssets()->getThumbPath($counterpart, $width, $height);
+                    $event->url = Craft::$app->getAssets()->getThumbUrl($counterpart, $width, $height);
                 }
             }
         );

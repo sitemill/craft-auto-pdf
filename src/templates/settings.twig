@@ -3,7 +3,12 @@
 {% set assetVolumes = craft.app.volumes.allVolumes() %}
 
 {% if assetVolumes|length  %}
-    {% set sources = {} %}
+    {% set sources = {
+        '' : {
+            label: 'Select...',
+            value: null
+        }
+    } %}
 
     {% for volume in assetVolumes %}
         {% set sources = sources|merge({
