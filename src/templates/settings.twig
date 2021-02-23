@@ -16,8 +16,8 @@
     {% endfor %}
 
     {{ forms.selectField({
-        label: 'Assets source'|t('silo'),
-        instructions: 'Select a volume where the Jpg will be uploaded.'|t('auto-pdf'),
+        label: 'Image volume'|t('silo'),
+        instructions: 'AutoPdf creates a counterpart image to perform transforms against. This should be a seperate volume used specifically for this purpose that can be hidden from users.'|t('auto-pdf'),
         id: 'pdfVolume',
         name: 'pdfVolume',
         value: settings.pdfVolume,
