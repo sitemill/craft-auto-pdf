@@ -19,7 +19,7 @@ To install the plugin, follow these instructions.
 
 2. Then tell Composer to load the plugin:
 
-        composer require sitemill/auto-pdf
+        composer require sitemill/craft-auto-pdf
 
 3. In the Control Panel, go to Settings → Plugins and click the “Install” button for Auto PDF.
 
@@ -27,11 +27,11 @@ To install the plugin, follow these instructions.
 
 AutoPDF will allow you to perform standard Craft transforms on any PDF file, as well as generating PDF thumbnails in the control panel.
 
-Flattening a PDF can be pretty stessful for your server, so to help it out AutoPDF creates and stores a hi-res flattened version of your uploaded PDF and creates subsequent transforms from this.  
+Flattening a PDF can be pretty stressful for your server, so to help it out AutoPDF creates and stores a hi-res flattened version of your uploaded PDF and creates subsequent transforms from this.  
 
 ## Configuring Auto PDF
 
-Auto PDF requires you to setup a seperate volume to store the hi-res image files. It's recommended that you hide this volume from your users to avoid confusion.
+Auto PDF requires you to set up a separate volume to store the hi-res image files. It's recommended that you hide this volume from your users to avoid confusion.
 
 ## Auto PDF Roadmap
 
