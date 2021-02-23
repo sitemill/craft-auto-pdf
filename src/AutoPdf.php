@@ -139,9 +139,13 @@ class AutoPdf extends Plugin
         Event::on(Assets::class,
             Assets::EVENT_GET_ASSET_URL,
             function(GetAssetUrlEvent $event) {
-                if ($event->asset !== null && $event->transform !== null && $event->asset->kind === 'pdf' && $event->transform) {
-                    $counterpart = AutoPdf::$plugin->autoPdfService->getCounterpart($event->asset);
-                    $event->url = $counterpart->getUrl($event->transform);
+                $asset = $event->asset;
+                $transform = $event->transform;
+                if ($asset !== null && $transform !== null && $asset->kind === 'pdf' && $transform) {
+                    // Get our counterpart
+                    $counterpart = AutoPdf::$plugin->autoPdfService->getCounterpart($asset);
+                    // Transform counterpart using standard asset transform
+                    $event->url = $counterpart->getUrl($transform);
                 }
             }
         );
@@ -151,12 +155,15 @@ class AutoPdf extends Plugin
             function(AssetThumbEvent $event) {
                 $asset = $event->asset;
                 if ($event->asset->kind === 'pdf') {
+                    // Get our counterpart
                     $counterpart = AutoPdf::$plugin->autoPdfService->getCounterpart($asset);
+                    // Get the width/height for CP thumb
                     if ($counterpart->getWidth() && $counterpart->getHeight()) {
                         [$width, $height] = \craft\helpers\Assets::scaledDimensions($counterpart->getWidth(), $counterpart->getHeight(), $event->width, $event->width);
                     } else {
                         $width = $height = $event->width;
                     }
+                    // Transform counterpart using standard Craft transform
                     $event->path = Craft::$app->getAssets()->getThumbPath($counterpart, $width, $height);
                 }
             }
@@ -168,10 +175,9 @@ class AutoPdf extends Plugin
                 Elements::EVENT_AFTER_SAVE_ELEMENT,
                 function(Event $event) {
                     $element = $event->element;
-                    if ($element instanceof \craft\elements\Asset) {
-                        if ($element->extension === 'pdf') {
-                            AutoPdf::$plugin->autoPdfService->getCounterpart($element);
-                        }
+                    if (($element instanceof \craft\elements\Asset) && $element->kind === 'pdf') {
+                        // Trigger creation of counterpart
+                        AutoPdf::$plugin->autoPdfService->getCounterpart($element);
                     }
                 }
             );

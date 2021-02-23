@@ -84,7 +84,7 @@ class AutoPdfService extends Component
     /*
      * @return mixed
      */
-    public function getSourcePdfPath(Asset $asset)
+    public function getSourcePdfPath(Asset $asset): string
     {
         $volumePath = $asset->getVolume()->settings['path'];
         $folderPath = $asset->getFolder()->path;

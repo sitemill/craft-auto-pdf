@@ -37,6 +37,7 @@ Auto PDF requires you to setup a seperate volume to store the hi-res image files
 
 Some things to do, and ideas for potential features:
 
+* Delete counterpart on PDF deletion
 * Option to output PNG's
 
 Brought to you by [Sitemill](sitemill.co)
