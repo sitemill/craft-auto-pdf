@@ -29,7 +29,17 @@ Flattening a PDF can be pretty stressful for your server, so to help it out Auto
 
 ## Configuring Auto PDF
 
+### Image Volume
 Auto PDF requires you to set up a separate volume to store the hi-res image files. It's recommended that you hide this volume from your users to avoid confusion.
+
+### Convert existing PDFs
+Only enable this if you have a few PDFs, or are in dev/staging environment as it will likely take a while.
+
+### Quality
+The compression quality, 'High' is recommended.
+
+### Resolution
+The resolution in DPI (dots per inch) that the PDF will be opened as, the higher the number the higher the quality before compression. 
 
 ## Auto PDF Roadmap
 

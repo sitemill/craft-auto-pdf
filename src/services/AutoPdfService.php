@@ -10,15 +10,15 @@
 
 namespace sitemill\autopdf\services;
 
-use craft\elements\Asset;
-use craft\helpers\App;
-use craft\helpers\Assets;
-use Imagine\Imagick\Imagick;
 use sitemill\autopdf\AutoPdf;
-use Spatie\PdfToImage\Pdf;
+
+use Imagine\Imagick\Imagick;
 
 use Craft;
+use craft\helpers\App;
+use craft\elements\Asset;
 use craft\base\Component;
+
 use Yii;
 use yii\base\Exception;
 
@@ -99,32 +99,19 @@ class AutoPdfService extends Component
         return $tempFolder . '/' . $filename;
     }
 
-
     /*
-     * @return mixed
-     */
-//    public function rasterizePdf($sourcePath, $filename)
-//    {
-//        $destinationPath = $this->getTempPath($filename);
-//        App::maxPowerCaptain();
-//        $pdf = new Pdf($sourcePath);
-//        $pdf->setCompressionQuality($this->settings->compressionQuality);
-//        $pdf->setResolution($this->settings->dpi);
-//        $pdf->setColorspace(1);
-//        $pdf->saveImage($destinationPath);
-//        return $destinationPath;
-//    }
-
+    * @return mixed
+    */
     public function rasterizePdf($sourcePath, $filename)
     {
         $destinationPath = $this->getTempPath($filename);
         App::maxPowerCaptain();
         $im = new Imagick();
-        $im->setResolution($this->settings->resolution,$this->settings->resolution);
+        $im->setResolution($this->settings->resolution, $this->settings->resolution);
         $im->setBackgroundColor('white');
         $im->readimage($sourcePath . '[0]');
         $im->setGravity(Imagick::GRAVITY_CENTER);
-        $im->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE );
+        $im->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE);
         $im->setImageCompressionQuality($this->settings->compressionQuality);
         $im->mergeImageLayers(Imagick::LAYERMETHOD_FLATTEN);
         $im->writeImage($this->getTempPath($filename));

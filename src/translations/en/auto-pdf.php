@@ -19,5 +19,6 @@ return [
     'Resolution' => 'Resolution',
     'No volume set for Auto PDF.' => 'No volume set for Auto PDF.',
     'Convert existing PDFs' => 'Convert existing PDFs',
-    'If enabled, all existing PDFs will be converted. If you have a lot of PDFs, this can take a long time and bring your site to a hault.' => 'If enabled, all existing PDFs will be converted. If you have a lot of PDFs, this can take a long time and bring your site to a hault.'
+    'If enabled, all existing PDFs will be converted. If you have a lot of PDFs, this can take a long time and bring your site to a hault.' => 'If enabled, all existing PDFs will be converted. If you have a lot of PDFs, this can take a long time and bring your site to a hault.',
+    'Temporary file does not exist.' => 'Temporary file does not exist.'
 ];
