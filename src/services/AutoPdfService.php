@@ -52,10 +52,17 @@ class AutoPdfService extends Component
         // Check for existing counterpart
         $counterpart = Asset::find()->filename($counterpartFilename)->one();
 
+        // If not counterpart, let's make it
         if (!$counterpart && $generate && Craft::$app->volumes->getVolumeById($this->settings->pdfVolume)) {
-            $tempFile = $this->rasterizePdf($asset->getCopyOfFile(), $counterpartFilename);
-            if ($this->setCounterpart($tempFile, $counterpartFilename)) {
-                $counterpart = Asset::find()->filename($counterpartFilename)->one();
+            $tempPdf = $asset->getCopyOfFile();
+            $tempImage = $this->rasterizePdf($tempPdf, $counterpartFilename);
+            if (file_exists($tempImage)) {
+                if ($this->setCounterpart($tempImage, $counterpartFilename)) {
+                    unlink($tempPdf);
+                    $counterpart = Asset::find()->filename($counterpartFilename)->one();
+                }
+            } else {
+                throw new Exception(Craft::t('auto-pdf', 'Temporary file does not exist.'));
             }
         }
         return $counterpart;
@@ -66,9 +73,6 @@ class AutoPdfService extends Component
     */
     private function setCounterpart($filePath, $filename)
     {
-        if (!file_exists($filePath)) {
-            throw new Exception(Craft::t('auto-pdf', 'Temporary file does not exist.'));
-        }
         $counterpart = new Asset();
         $counterpart->tempFilePath = $filePath;
         $counterpart->filename = $filename;
