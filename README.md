@@ -7,8 +7,6 @@ Seamlessly create PDF thumbnails using Craft's built in image transformer.
 
 This plugin requires Craft CMS 3.6 or later, Imagick, and Ghostscript. 
 
-This plugin makes use of [spatie/pdf-to-image](https://github.com/spatie/pdf-to-image), if you have issues with Ghostscript see [common issues](https://github.com/spatie/pdf-to-image#issues-regarding-ghostscript).
-
 ## Installation
 
 To install the plugin, follow these instructions.
@@ -38,7 +36,6 @@ Auto PDF requires you to set up a separate volume to store the hi-res image file
 Some things to do, and ideas for potential features:
 
 * Delete counterpart on PDF deletion
-* Option to output PNGs
 * Look at pushing conversion to the job queue
 
 Brought to you by [Sitemill](sitemill.co)

@@ -13,6 +13,7 @@ namespace sitemill\autopdf\services;
 use craft\elements\Asset;
 use craft\helpers\App;
 use craft\helpers\Assets;
+use Imagine\Imagick\Imagick;
 use sitemill\autopdf\AutoPdf;
 use Spatie\PdfToImage\Pdf;
 
@@ -44,12 +45,14 @@ class AutoPdfService extends Component
     */
     public function getCounterpart(Asset $asset, bool $generate = true)
     {
+
         // Build unique filename for counterpart
         $counterpartFilename = pathinfo($asset->filename, PATHINFO_FILENAME) . '-' . $asset->id . '.jpg';
 
         // Check for existing counterpart
         $counterpart = Asset::find()->filename($counterpartFilename)->one();
-        if (!$counterpart && $generate) {
+
+        if (!$counterpart && $generate && Craft::$app->volumes->getVolumeById($this->settings->pdfVolume)) {
             $tempFile = $this->rasterizePdf($asset->getCopyOfFile(), $counterpartFilename);
             if ($this->setCounterpart($tempFile, $counterpartFilename)) {
                 $counterpart = Asset::find()->filename($counterpartFilename)->one();
@@ -63,16 +66,14 @@ class AutoPdfService extends Component
     */
     private function setCounterpart($filePath, $filename)
     {
-        $volumeId = $this->settings->pdfVolume;
-        if ($volumeId) {
-            $counterpart = new Asset();
-            $counterpart->tempFilePath = $filePath;
-            $counterpart->filename = $filename;
-            $counterpart->folderId = Craft::$app->assets->getRootFolderByVolumeId($volumeId)->id;
-            return Craft::$app->getElements()->saveElement($counterpart);
-        } else {
-            throw new Exception(Craft::t('auto-pdf', 'No volume set for Auto PDF.'));
+        if (!file_exists($filePath)) {
+            throw new Exception(Craft::t('auto-pdf', 'Temporary file does not exist.'));
         }
+        $counterpart = new Asset();
+        $counterpart->tempFilePath = $filePath;
+        $counterpart->filename = $filename;
+        $counterpart->folderId = Craft::$app->assets->getRootFolderByVolumeId($this->settings->pdfVolume)->id;
+        return Craft::$app->getElements()->saveElement($counterpart);
     }
 
     /*
@@ -98,15 +99,33 @@ class AutoPdfService extends Component
     /*
      * @return mixed
      */
-    public function rasterizePdf($sourcePath,$filename)
+//    public function rasterizePdf($sourcePath, $filename)
+//    {
+//        $destinationPath = $this->getTempPath($filename);
+//        App::maxPowerCaptain();
+//        $pdf = new Pdf($sourcePath);
+//        $pdf->setCompressionQuality($this->settings->compressionQuality);
+//        $pdf->setResolution($this->settings->dpi);
+//        $pdf->setColorspace(1);
+//        $pdf->saveImage($destinationPath);
+//        return $destinationPath;
+//    }
+
+    public function rasterizePdf($sourcePath, $filename)
     {
         $destinationPath = $this->getTempPath($filename);
         App::maxPowerCaptain();
-        $pdf = new Pdf($sourcePath);
-        $pdf->setCompressionQuality($this->settings->compressionQuality);
-        $pdf->setResolution($this->settings->dpi);
-        $pdf->setColorspace(1);
-        $pdf->saveImage($destinationPath);
+        $im = new Imagick();
+        $im->setResolution($this->settings->resolution,$this->settings->resolution);
+        $im->setBackgroundColor('white');
+        $im->readimage($sourcePath . '[0]');
+        $im->setGravity(Imagick::GRAVITY_CENTER);
+        $im->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE );
+        $im->setImageCompressionQuality($this->settings->compressionQuality);
+        $im->mergeImageLayers(Imagick::LAYERMETHOD_FLATTEN);
+        $im->writeImage($this->getTempPath($filename));
+        $im->clear();
+        $im->destroy();
         return $destinationPath;
     }
 

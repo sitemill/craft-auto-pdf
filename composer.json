@@ -25,7 +25,8 @@
   ],
   "require": {
     "craftcms/cms": "^3.6",
-    "spatie/pdf-to-image": "^2.1"
+    "php" : "^7.2|^8.0",
+    "ext-imagick" : "*"
   },
   "autoload": {
     "psr-4": {

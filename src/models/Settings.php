@@ -27,6 +27,6 @@ class Settings extends Model
 {
     public $pdfVolume = null;
     public $generateExisting = false;
-    public $compressionQuality = 82;
-    public $dpi = 300;
+    public $compressionQuality = 60;
+    public $resolution = 150;
 }
