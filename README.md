@@ -1,4 +1,6 @@
-# Auto PDF plugin for Craft CMS
+<img src="/sitemill/craft-auto-pdf/raw/main/src/icon.svg" width="150" height="150" alt="Auto PDF for Craft CMS">
+
+__For now this plugin is for internal use at Sitemill, feel free to use if it fits your purpose but no support is guaranteed.__
 
 Seamlessly create PDF thumbnails using Craft's built in image transformer.
 
